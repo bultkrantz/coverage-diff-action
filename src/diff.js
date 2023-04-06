@@ -1,9 +1,10 @@
 const coverageDiff = require("coverage-diff");
+const { REGRESSION_RULE_CHECK, PR_MESSAGE } = require("./constants");
 
 const ICONS = {
   OK: "✅",
-  WARN: "⚠️",
-  KO: "🔴",
+  WARN: "👎",
+  KO: "🚫",
 };
 
 const CRITERIAS = ["lines", "branches", "functions", "statements"];
@@ -82,13 +83,32 @@ function computeDiff(base, head, options = {}) {
     )} (${_renderPct(diffPct)})`;
   });
 
-  if (globalRegression) {
-    totalTitle = `${
-      options.allowedToFail ? ICONS.WARN : ICONS.KO
-    } Total coverage is lower than the default branch`;
+  if (diffPct <= 0) {
+    let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;
+
+    // FEATURE
+    if (REGRESSION_RULE_CHECK.FEATURE(diffPct)) {
+      totalTitle = `${baseTitle} ${PR_MESSAGE.FEATURE_ERROR}`;
+    }
+
+    // BUGFIX
+    else if (REGRESSION_RULE_CHECK.BUGFIX(diffPct)) {
+      totalTitle = `${baseTitle} ${PR_MESSAGE.BUGFIX_ERROR}`;
+    }
+
+    // REFACTORING
+    else if (REGRESSION_RULE_CHECK.REFACTORING(diffPct)) {
+      totalTitle = `${baseTitle} ${PR_MESSAGE.REFACTORING_ERROR}`;
+    }
+
+    // REGRESSION
+    else {
+      totalTitle = `${baseTitle} ${PR_MESSAGE.REGRESSION_ERROR}`;
+    }
   }
 
   return {
+    regressionPercentage: diffPct,
     regression: globalRegression,
     markdown: `
 ### ${totalTitle}

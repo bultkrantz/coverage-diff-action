@@ -13893,10 +13893,33 @@ module.exports = { addComment, deleteExistingComments };
 
 /***/ }),
 
+/***/ 4438:
+/***/ ((module) => {
+
+const PR_MESSAGE = Object.freeze({
+  FEATURE_ERROR: "New features need to have test coverage",
+  BUGFIX_ERROR: "For bugfixes, the test coverage should not decrease",
+  REFACTORING_ERROR:
+    "For refactoring, the test coverage should not decrease more than 5%",
+  REGRESSION_ERROR: "Total coverage is lower than the default branch",
+});
+
+const REGRESSION_RULE_CHECK = Object.freeze({
+  FEATURE: (regressionPercentage) => regressionPercentage <= 0,
+  BUGFIX: (regressionPercentage) => regressionPercentage < 0,
+  REFACTORING: (regressionPercentage) => regressionPercentage < -5,
+});
+
+module.exports = { PR_MESSAGE, REGRESSION_RULE_CHECK };
+
+
+/***/ }),
+
 /***/ 1752:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const coverageDiff = __nccwpck_require__(6387);
+const { REGRESSION_RULE_CHECK, PR_MESSAGE } = __nccwpck_require__(4438);
 
 const ICONS = {
   OK: "✅",
@@ -13980,13 +14003,32 @@ function computeDiff(base, head, options = {}) {
     )} (${_renderPct(diffPct)})`;
   });
 
-  if (globalRegression) {
-    totalTitle = `${
-      options.allowedToFail ? ICONS.WARN : ICONS.KO
-    } Total coverage is lower than the default branch`;
+  if (diffPct <= 0) {
+    let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;
+
+    // FEATURE
+    if (REGRESSION_RULE_CHECK.FEATURE(diffPct)) {
+      totalTitle = `${baseTitle} ${PR_MESSAGE.FEATURE_ERROR}`;
+    }
+
+    // BUGFIX
+    else if (REGRESSION_RULE_CHECK.BUGFIX(diffPct)) {
+      totalTitle = `${baseTitle} ${PR_MESSAGE.BUGFIX_ERROR}`;
+    }
+
+    // REFACTORING
+    else if (REGRESSION_RULE_CHECK.REFACTORING(diffPct)) {
+      totalTitle = `${baseTitle} ${PR_MESSAGE.REFACTORING_ERROR}`;
+    }
+
+    // REGRESSION
+    else {
+      totalTitle = `${baseTitle} ${PR_MESSAGE.REGRESSION_ERROR}`;
+    }
   }
 
   return {
+    regressionPercentage: diffPct,
     regression: globalRegression,
     markdown: `
 ### ${totalTitle}
@@ -14060,6 +14102,47 @@ function average(arr, fixed = 2) {
 }
 
 module.exports = { average };
+
+
+/***/ }),
+
+/***/ 377:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const { PR_MESSAGE, REGRESSION_RULE_CHECK } = __nccwpck_require__(4438);
+
+function throwRegressionError(prTitle, regressionPercentage, globalRegression) {
+  // FEATURES
+  if (
+    prTitle.includes("feature/") &&
+    REGRESSION_RULE_CHECK.FEATURE(regressionPercentage)
+  ) {
+    throw new Error(PR_MESSAGE.FEATURE_ERROR);
+  }
+
+  // BUGFIXES
+  if (
+    prTitle.includes("bugfix/") &&
+    REGRESSION_RULE_CHECK.BUGFIX(regressionPercentage)
+  ) {
+    throw new Error(PR_MESSAGE.BUGFIX_ERROR);
+  }
+
+  // REFACTORING
+  if (
+    prTitle.includes("refactor/") &&
+    REGRESSION_RULE_CHECK.REFACTORING(regressionPercentage)
+  ) {
+    throw new Error(PR_MESSAGE.REFACTORING_ERROR);
+  }
+
+  // DEFAULT REGRESSION
+  if (globalRegression) {
+    throw new Error(PR_MESSAGE.REGRESSION_ERROR);
+  }
+}
+
+module.exports = { throwRegressionError };
 
 
 /***/ }),
@@ -14283,8 +14366,10 @@ const { getShieldURL, getJSONBadge } = __nccwpck_require__(3673);
 const { average } = __nccwpck_require__(8978);
 const { computeDiff } = __nccwpck_require__(1752);
 const { addComment, deleteExistingComments } = __nccwpck_require__(427);
+const { throwRegressionError } = __nccwpck_require__(377);
 
 const { context } = github;
+const prTitle = context.payload.pull_request.title;
 console.log("context", context.payload.pull_request.title);
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
@@ -14368,8 +14453,8 @@ async function run() {
       core.info(diff.results);
     }
 
-    if (!allowedToFail && diff.regression) {
-      throw new Error("Total coverage is lower than the default branch");
+    if (!allowedToFail && diff.regressionPercentage <= 0) {
+      throwRegressionError(prTitle, diff.regressionPercentage, diff.regression);
     }
   }
 }

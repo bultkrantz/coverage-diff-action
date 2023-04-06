@@ -16,8 +16,10 @@ const { getShieldURL, getJSONBadge } = require("./badge");
 const { average } = require("./math");
 const { computeDiff } = require("./diff");
 const { addComment, deleteExistingComments } = require("./comment");
+const { throwRegressionError } = require("./regression");
 
 const { context } = github;
+const prTitle = context.payload.pull_request.title;
 console.log("context", context.payload.pull_request.title);
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
@@ -101,8 +103,8 @@ async function run() {
       core.info(diff.results);
     }
 
-    if (!allowedToFail && diff.regression) {
-      throw new Error("Total coverage is lower than the default branch");
+    if (!allowedToFail && diff.regressionPercentage <= 0) {
+      throwRegressionError(prTitle, diff.regressionPercentage, diff.regression);
     }
   }
 }
