@@ -13923,8 +13923,8 @@ const { REGRESSION_RULE_CHECK, PR_MESSAGE } = __nccwpck_require__(4438);
 
 const ICONS = {
   OK: "✅",
-  WARN: "⚠️",
-  KO: "🔴",
+  WARN: "👎",
+  KO: "🚫",
 };
 
 const CRITERIAS = ["lines", "branches", "functions", "statements"];
@@ -13992,8 +13992,9 @@ function computeDiff(base, head, options = {}) {
 
   let totals = {};
   let globalRegression = false;
+  let diffPct = head.total[criteria].pct - base.total[criteria].pct;
+
   CRITERIAS.forEach((criteria) => {
-    let diffPct = head.total[criteria].pct - base.total[criteria].pct;
     if (diffPct < 0) {
       globalRegression = true;
     }
