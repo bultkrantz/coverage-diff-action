@@ -18,7 +18,7 @@ const { computeDiff } = require("./diff");
 const { addComment, deleteExistingComments } = require("./comment");
 
 const { context } = github;
-console.log("context", context.pull_request.title);
+console.log("context", context.payload.pull_request.title);
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
     recursive: true,
