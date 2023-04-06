@@ -14285,7 +14285,7 @@ const { computeDiff } = __nccwpck_require__(1752);
 const { addComment, deleteExistingComments } = __nccwpck_require__(427);
 
 const { context } = github;
-
+console.log("context", context);
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
     recursive: true,
