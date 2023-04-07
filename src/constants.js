@@ -9,6 +9,8 @@ const prefixes = core.getInput("prefix-options");
 //   },
 // ];
 
+console.log("prefixes", prefixes);
+
 const PR_TITLE = Object.freeze({
   FEATURE: "feature/",
   BUGFIX: "bugfix/",
