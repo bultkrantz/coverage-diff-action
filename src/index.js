@@ -23,6 +23,11 @@ const prTitle = context.payload.pull_request.title;
 const isDependabotPr = context.actor === "dependabot[bot]";
 
 async function run() {
+  if (isDependabotPr) {
+    core.info("This is a dependabot PR, skipping coverage diff");
+    return;
+  }
+
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
     recursive: true,
   });
@@ -48,11 +53,6 @@ async function run() {
     Object.keys(head.total).map((t) => head.total[t].pct),
     0
   );
-
-  if (isDependabotPr) {
-    core.info("This is a dependabot PR, skipping coverage diff");
-    return;
-  }
 
   if (
     isBranch() &&
