@@ -1,13 +1,25 @@
+const core = require("@actions/core");
+const prefixes = core.getInput("prefix-options");
+
+// prefixes model:
+// [
+//   {
+//     name: "feature/",
+//     threshold: 0,
+//   },
+// ];
+
 const PR_TITLE = Object.freeze({
   FEATURE: "feature/",
   BUGFIX: "bugfix/",
-  REFACTORING: "refactor/",
+  REFACTORING: "refactoring/",
 });
 
 const PERCENTAGE_THRESHOLD = Object.freeze({
-  FEATURE: 0,
-  BUGFIX: 0,
-  REFACTORING: 0.05,
+  FEATURE: prefixes?.find(({ name }) => name === "feature/")?.threshold || 0,
+  BUGFIX: prefixes?.find(({ name }) => name === "bugfix/")?.threshold || 0,
+  REFACTORING:
+    prefixes?.find(({ name }) => name === "refactoring/")?.threshold || 0,
 });
 
 const PR_MESSAGE = Object.freeze({
@@ -19,11 +31,11 @@ const PR_MESSAGE = Object.freeze({
 
 const REGRESSION_RULE_CHECK = Object.freeze({
   FEATURE: (regressionPercentage) =>
-    regressionPercentage <= PERCENTAGE_THRESHOLD.FEATURE,
+    regressionPercentage < PERCENTAGE_THRESHOLD.FEATURE,
   BUGFIX: (regressionPercentage) =>
     regressionPercentage < PERCENTAGE_THRESHOLD.BUGFIX,
   REFACTORING: (regressionPercentage) =>
-    regressionPercentage < -PERCENTAGE_THRESHOLD.REFACTORING,
+    regressionPercentage < PERCENTAGE_THRESHOLD.REFACTORING,
 });
 
 const PR_TITLE_CHECK = Object.freeze({
