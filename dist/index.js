@@ -14401,8 +14401,7 @@ const { throwRegressionError } = __nccwpck_require__(377);
 
 const { context } = github;
 const prTitle = context.payload.pull_request.title;
-console.log("context.actor", context.actor);
-console.log("context", context);
+const isDependabotPr = context.actor === "dependabot";
 
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
@@ -14430,6 +14429,11 @@ async function run() {
     Object.keys(head.total).map((t) => head.total[t].pct),
     0
   );
+
+  if (isDependabotPr) {
+    core.info("This is a dependabot PR, skipping coverage diff");
+    return;
+  }
 
   if (
     isBranch() &&
