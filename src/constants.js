@@ -24,4 +24,9 @@ const PR_TITLE_CHECK = Object.freeze({
   REFACTORING: (prTitle) => prTitle.includes(PR_TITLE.REFACTORING),
 });
 
-module.exports = { PR_MESSAGE, REGRESSION_RULE_CHECK, PR_TITLE_CHECK };
+module.exports = {
+  PR_MESSAGE,
+  REGRESSION_RULE_CHECK,
+  PR_TITLE_CHECK,
+  PR_TITLE,
+};
