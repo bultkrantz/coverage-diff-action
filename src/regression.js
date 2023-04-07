@@ -1,9 +1,13 @@
-const { PR_MESSAGE, REGRESSION_RULE_CHECK } = require("./constants");
+const {
+  PR_MESSAGE,
+  REGRESSION_RULE_CHECK,
+  PR_TITLE_CHECK,
+} = require("./constants");
 
 function throwRegressionError(prTitle, regressionPercentage, globalRegression) {
   // FEATURES
   if (
-    prTitle.includes("feature/") &&
+    PR_TITLE_CHECK.FEATURE(prTitle) &&
     REGRESSION_RULE_CHECK.FEATURE(regressionPercentage)
   ) {
     throw new Error(PR_MESSAGE.FEATURE_ERROR);
@@ -11,7 +15,7 @@ function throwRegressionError(prTitle, regressionPercentage, globalRegression) {
 
   // BUGFIXES
   if (
-    prTitle.includes("bugfix/") &&
+    PR_TITLE_CHECK.BUGFIX(prTitle) &&
     REGRESSION_RULE_CHECK.BUGFIX(regressionPercentage)
   ) {
     throw new Error(PR_MESSAGE.BUGFIX_ERROR);
@@ -19,7 +23,7 @@ function throwRegressionError(prTitle, regressionPercentage, globalRegression) {
 
   // REFACTORING
   if (
-    prTitle.includes("refactor/") &&
+    PR_TITLE_CHECK.REFACTORING(prTitle) &&
     REGRESSION_RULE_CHECK.REFACTORING(regressionPercentage)
   ) {
     throw new Error(PR_MESSAGE.REFACTORING_ERROR);

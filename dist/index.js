@@ -13896,6 +13896,12 @@ module.exports = { addComment, deleteExistingComments };
 /***/ 4438:
 /***/ ((module) => {
 
+const PR_TITLE = Object.freeze({
+  FEATURE: "feature/",
+  BUGFIX: "bugfix/",
+  REFACTORING: "refactor/",
+});
+
 const PR_MESSAGE = Object.freeze({
   FEATURE_ERROR: "New features need to have test coverage",
   BUGFIX_ERROR: "For bugfixes, the test coverage should not decrease",
@@ -13911,9 +13917,9 @@ const REGRESSION_RULE_CHECK = Object.freeze({
 });
 
 const PR_TITLE_CHECK = Object.freeze({
-  FEATURE: (prTitle) => prTitle.includes("feature/"),
-  BUGFIX: (prTitle) => prTitle.includes("bugfix/"),
-  REFACTORING: (prTitle) => prTitle.includes("refactor/"),
+  FEATURE: (prTitle) => prTitle.includes(PR_TITLE.FEATURE),
+  BUGFIX: (prTitle) => prTitle.includes(PR_TITLE.BUGFIX),
+  REFACTORING: (prTitle) => prTitle.includes(PR_TITLE.REFACTORING),
 });
 
 module.exports = { PR_MESSAGE, REGRESSION_RULE_CHECK, PR_TITLE_CHECK };
@@ -14130,12 +14136,16 @@ module.exports = { average };
 /***/ 377:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const { PR_MESSAGE, REGRESSION_RULE_CHECK } = __nccwpck_require__(4438);
+const {
+  PR_MESSAGE,
+  REGRESSION_RULE_CHECK,
+  PR_TITLE_CHECK,
+} = __nccwpck_require__(4438);
 
 function throwRegressionError(prTitle, regressionPercentage, globalRegression) {
   // FEATURES
   if (
-    prTitle.includes("feature/") &&
+    PR_TITLE_CHECK.FEATURE(prTitle) &&
     REGRESSION_RULE_CHECK.FEATURE(regressionPercentage)
   ) {
     throw new Error(PR_MESSAGE.FEATURE_ERROR);
@@ -14143,7 +14153,7 @@ function throwRegressionError(prTitle, regressionPercentage, globalRegression) {
 
   // BUGFIXES
   if (
-    prTitle.includes("bugfix/") &&
+    PR_TITLE_CHECK.BUGFIX(prTitle) &&
     REGRESSION_RULE_CHECK.BUGFIX(regressionPercentage)
   ) {
     throw new Error(PR_MESSAGE.BUGFIX_ERROR);
@@ -14151,7 +14161,7 @@ function throwRegressionError(prTitle, regressionPercentage, globalRegression) {
 
   // REFACTORING
   if (
-    prTitle.includes("refactor/") &&
+    PR_TITLE_CHECK.REFACTORING(prTitle) &&
     REGRESSION_RULE_CHECK.REFACTORING(regressionPercentage)
   ) {
     throw new Error(PR_MESSAGE.REFACTORING_ERROR);

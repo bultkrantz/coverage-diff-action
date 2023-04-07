@@ -1,3 +1,9 @@
+const PR_TITLE = Object.freeze({
+  FEATURE: "feature/",
+  BUGFIX: "bugfix/",
+  REFACTORING: "refactor/",
+});
+
 const PR_MESSAGE = Object.freeze({
   FEATURE_ERROR: "New features need to have test coverage",
   BUGFIX_ERROR: "For bugfixes, the test coverage should not decrease",
@@ -13,9 +19,9 @@ const REGRESSION_RULE_CHECK = Object.freeze({
 });
 
 const PR_TITLE_CHECK = Object.freeze({
-  FEATURE: (prTitle) => prTitle.includes("feature/"),
-  BUGFIX: (prTitle) => prTitle.includes("bugfix/"),
-  REFACTORING: (prTitle) => prTitle.includes("refactor/"),
+  FEATURE: (prTitle) => prTitle.includes(PR_TITLE.FEATURE),
+  BUGFIX: (prTitle) => prTitle.includes(PR_TITLE.BUGFIX),
+  REFACTORING: (prTitle) => prTitle.includes(PR_TITLE.REFACTORING),
 });
 
 module.exports = { PR_MESSAGE, REGRESSION_RULE_CHECK, PR_TITLE_CHECK };
