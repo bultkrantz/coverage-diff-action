@@ -1,4 +1,6 @@
 const coverageDiff = require("coverage-diff");
+const core = require("@actions/core");
+
 const {
   REGRESSION_RULE_CHECK,
   PR_MESSAGE,
@@ -88,6 +90,9 @@ function computeDiff(base, head, options = {}, prTitle) {
       false
     )} (${_renderPct(diffPct)})`;
   });
+
+  core.info(`Test coverage diff percentage: ${diffPct.toFixed(2)}%`);
+  core.info(`Has global regression: ${globalRegression}`);
 
   if (diffPct != undefined && diffPct <= 0) {
     let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;

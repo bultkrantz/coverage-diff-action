@@ -13949,6 +13949,8 @@ module.exports = {
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const coverageDiff = __nccwpck_require__(6387);
+const core = __nccwpck_require__(2186);
+
 const {
   REGRESSION_RULE_CHECK,
   PR_MESSAGE,
@@ -14038,6 +14040,9 @@ function computeDiff(base, head, options = {}, prTitle) {
       false
     )} (${_renderPct(diffPct)})`;
   });
+
+  core.info(`Test coverage diff percentage: ${diffPct.toFixed(2)}%`);
+  core.info(`Has global regression: ${globalRegression}`);
 
   if (diffPct != undefined && diffPct <= 0) {
     let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;
@@ -14419,6 +14424,15 @@ const prTitle = context.payload.pull_request.title;
 const isDependabotPr = context.actor === "dependabot[bot]";
 
 async function run() {
+  core.info(`PR Title: ${prTitle}`);
+  core.info(`Is dependabot PR: ${isDependabotPr}`);
+  core.info(`Actor: ${context.actor}`);
+
+  if (isDependabotPr) {
+    core.info("This is a dependabot PR, skipping coverage diff");
+    return;
+  }
+
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
     recursive: true,
   });
@@ -14444,11 +14458,6 @@ async function run() {
     Object.keys(head.total).map((t) => head.total[t].pct),
     0
   );
-
-  if (isDependabotPr) {
-    core.info("This is a dependabot PR, skipping coverage diff");
-    return;
-  }
 
   if (
     isBranch() &&

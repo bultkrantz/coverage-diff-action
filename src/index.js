@@ -23,6 +23,10 @@ const prTitle = context.payload.pull_request.title;
 const isDependabotPr = context.actor === "dependabot[bot]";
 
 async function run() {
+  core.info(`PR Title: ${prTitle}`);
+  core.info(`Is dependabot PR: ${isDependabotPr}`);
+  core.info(`Actor: ${context.actor}`);
+
   if (isDependabotPr) {
     core.info("This is a dependabot PR, skipping coverage diff");
     return;
