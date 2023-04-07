@@ -1,5 +1,9 @@
 const coverageDiff = require("coverage-diff");
-const { REGRESSION_RULE_CHECK, PR_MESSAGE } = require("./constants");
+const {
+  REGRESSION_RULE_CHECK,
+  PR_MESSAGE,
+  PR_TITLE_CHECK,
+} = require("./constants");
 
 const ICONS = {
   OK: "✅",
@@ -16,7 +20,7 @@ function _renderPct(pct, addSign = true) {
   return `${pct.toFixed(2)}%`;
 }
 
-function computeDiff(base, head, options = {}) {
+function computeDiff(base, head, options = {}, prTitle) {
   const diff = coverageDiff.diff(base, head);
 
   let totalTitle = "Total coverage";
@@ -89,22 +93,31 @@ function computeDiff(base, head, options = {}) {
     let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;
 
     // FEATURE
-    if (REGRESSION_RULE_CHECK.FEATURE(diffPct)) {
+    if (
+      PR_TITLE_CHECK.FEATURE(prTitle) &&
+      REGRESSION_RULE_CHECK.FEATURE(diffPct)
+    ) {
       totalTitle = `${baseTitle} ${PR_MESSAGE.FEATURE_ERROR}`;
     }
 
     // BUGFIX
-    else if (REGRESSION_RULE_CHECK.BUGFIX(diffPct)) {
+    else if (
+      PR_TITLE_CHECK.BUGFIX(prTitle) &&
+      REGRESSION_RULE_CHECK.BUGFIX(diffPct)
+    ) {
       totalTitle = `${baseTitle} ${PR_MESSAGE.BUGFIX_ERROR}`;
     }
 
     // REFACTORING
-    else if (REGRESSION_RULE_CHECK.REFACTORING(diffPct)) {
+    else if (
+      PR_TITLE_CHECK.REFACTORING(prTitle) &&
+      REGRESSION_RULE_CHECK.REFACTORING(diffPct)
+    ) {
       totalTitle = `${baseTitle} ${PR_MESSAGE.REFACTORING_ERROR}`;
     }
 
     // REGRESSION
-    else {
+    else if (globalRegression) {
       totalTitle = `${baseTitle} ${PR_MESSAGE.REGRESSION_ERROR}`;
     }
   }

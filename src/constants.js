@@ -12,4 +12,10 @@ const REGRESSION_RULE_CHECK = Object.freeze({
   REFACTORING: (regressionPercentage) => regressionPercentage < -5,
 });
 
-module.exports = { PR_MESSAGE, REGRESSION_RULE_CHECK };
+const PR_TITLE_CHECK = Object.freeze({
+  FEATURE: (prTitle) => prTitle.includes("feature/"),
+  BUGFIX: (prTitle) => prTitle.includes("bugfix/"),
+  REFACTORING: (prTitle) => prTitle.includes("refactor/"),
+});
+
+module.exports = { PR_MESSAGE, REGRESSION_RULE_CHECK, PR_TITLE_CHECK };

@@ -13910,7 +13910,13 @@ const REGRESSION_RULE_CHECK = Object.freeze({
   REFACTORING: (regressionPercentage) => regressionPercentage < -5,
 });
 
-module.exports = { PR_MESSAGE, REGRESSION_RULE_CHECK };
+const PR_TITLE_CHECK = Object.freeze({
+  FEATURE: (prTitle) => prTitle.includes("feature/"),
+  BUGFIX: (prTitle) => prTitle.includes("bugfix/"),
+  REFACTORING: (prTitle) => prTitle.includes("refactor/"),
+});
+
+module.exports = { PR_MESSAGE, REGRESSION_RULE_CHECK, PR_TITLE_CHECK };
 
 
 /***/ }),
@@ -13919,7 +13925,11 @@ module.exports = { PR_MESSAGE, REGRESSION_RULE_CHECK };
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const coverageDiff = __nccwpck_require__(6387);
-const { REGRESSION_RULE_CHECK, PR_MESSAGE } = __nccwpck_require__(4438);
+const {
+  REGRESSION_RULE_CHECK,
+  PR_MESSAGE,
+  PR_TITLE_CHECK,
+} = __nccwpck_require__(4438);
 
 const ICONS = {
   OK: "✅",
@@ -13936,7 +13946,7 @@ function _renderPct(pct, addSign = true) {
   return `${pct.toFixed(2)}%`;
 }
 
-function computeDiff(base, head, options = {}) {
+function computeDiff(base, head, options = {}, prTitle) {
   const diff = coverageDiff.diff(base, head);
 
   let totalTitle = "Total coverage";
@@ -14009,22 +14019,31 @@ function computeDiff(base, head, options = {}) {
     let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;
 
     // FEATURE
-    if (REGRESSION_RULE_CHECK.FEATURE(diffPct)) {
+    if (
+      PR_TITLE_CHECK.FEATURE(prTitle) &&
+      REGRESSION_RULE_CHECK.FEATURE(diffPct)
+    ) {
       totalTitle = `${baseTitle} ${PR_MESSAGE.FEATURE_ERROR}`;
     }
 
     // BUGFIX
-    else if (REGRESSION_RULE_CHECK.BUGFIX(diffPct)) {
+    else if (
+      PR_TITLE_CHECK.BUGFIX(prTitle) &&
+      REGRESSION_RULE_CHECK.BUGFIX(diffPct)
+    ) {
       totalTitle = `${baseTitle} ${PR_MESSAGE.BUGFIX_ERROR}`;
     }
 
     // REFACTORING
-    else if (REGRESSION_RULE_CHECK.REFACTORING(diffPct)) {
+    else if (
+      PR_TITLE_CHECK.REFACTORING(prTitle) &&
+      REGRESSION_RULE_CHECK.REFACTORING(diffPct)
+    ) {
       totalTitle = `${baseTitle} ${PR_MESSAGE.REFACTORING_ERROR}`;
     }
 
     // REGRESSION
-    else {
+    else if (globalRegression) {
       totalTitle = `${baseTitle} ${PR_MESSAGE.REGRESSION_ERROR}`;
     }
   }
@@ -14372,7 +14391,9 @@ const { throwRegressionError } = __nccwpck_require__(377);
 
 const { context } = github;
 const prTitle = context.payload.pull_request.title;
-console.log("context", context.payload.pull_request.title);
+console.log("context.actor", context.actor);
+console.log("context", context);
+
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
     recursive: true,
@@ -14444,7 +14465,7 @@ async function run() {
       await readFile(path.join(WIKI_PATH, baseSummaryFilename), "utf8")
     );
 
-    const diff = computeDiff(base, head, { allowedToFail });
+    const diff = computeDiff(base, head, { allowedToFail }, prTitle);
 
     if (issue_number) {
       await deleteExistingComments(octokit, context.repo, issue_number);

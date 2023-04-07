@@ -20,7 +20,9 @@ const { throwRegressionError } = require("./regression");
 
 const { context } = github;
 const prTitle = context.payload.pull_request.title;
-console.log("context", context.payload.pull_request.title);
+console.log("context.actor", context.actor);
+console.log("context", context);
+
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
     recursive: true,
@@ -92,7 +94,7 @@ async function run() {
       await readFile(path.join(WIKI_PATH, baseSummaryFilename), "utf8")
     );
 
-    const diff = computeDiff(base, head, { allowedToFail });
+    const diff = computeDiff(base, head, { allowedToFail }, prTitle);
 
     if (issue_number) {
       await deleteExistingComments(octokit, context.repo, issue_number);
