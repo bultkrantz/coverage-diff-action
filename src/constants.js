@@ -28,5 +28,4 @@ module.exports = {
   PR_MESSAGE,
   REGRESSION_RULE_CHECK,
   PR_TITLE_CHECK,
-  PR_TITLE,
 };

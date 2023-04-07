@@ -13926,7 +13926,6 @@ module.exports = {
   PR_MESSAGE,
   REGRESSION_RULE_CHECK,
   PR_TITLE_CHECK,
-  PR_TITLE,
 };
 
 
@@ -13940,7 +13939,6 @@ const {
   REGRESSION_RULE_CHECK,
   PR_MESSAGE,
   PR_TITLE_CHECK,
-  PR_TITLE,
 } = __nccwpck_require__(4438);
 
 const ICONS = {
@@ -14032,28 +14030,30 @@ function computeDiff(base, head, options = {}, prTitle) {
   if (diffPct != undefined && diffPct <= 0) {
     let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;
 
-    switch (prTitle) {
-      case PR_TITLE.FEATURE:
-        if (REGRESSION_RULE_CHECK.FEATURE(diffPct)) {
-          totalTitle = `${baseTitle} ${PR_MESSAGE.FEATURE_ERROR}`;
-        }
-        break;
-      case PR_TITLE.BUGFIX:
-        if (REGRESSION_RULE_CHECK.BUGFIX(diffPct)) {
-          totalTitle = `${baseTitle} ${PR_MESSAGE.BUGFIX_ERROR}`;
-        }
-        break;
-      case PR_TITLE.REFACTORING:
-        if (REGRESSION_RULE_CHECK.REFACTORING(diffPct)) {
-          totalTitle = `${baseTitle} ${PR_MESSAGE.REFACTORING_ERROR}`;
-        }
-        break;
+    // FEATURE
+    if (PR_TITLE_CHECK.FEATURE(prTitle)) {
+      if (REGRESSION_RULE_CHECK.FEATURE(diffPct)) {
+        totalTitle = `${baseTitle} ${PR_MESSAGE.FEATURE_ERROR}`;
+      }
+    }
 
-      default:
-        if (globalRegression) {
-          totalTitle = `${baseTitle} ${PR_MESSAGE.REGRESSION_ERROR}`;
-        }
-        break;
+    // BUGFIX
+    else if (PR_TITLE_CHECK.BUGFIX(prTitle)) {
+      if (REGRESSION_RULE_CHECK.BUGFIX(diffPct)) {
+        totalTitle = `${baseTitle} ${PR_MESSAGE.BUGFIX_ERROR}`;
+      }
+    }
+
+    // REFACTORING
+    else if (PR_TITLE_CHECK.REFACTORING(prTitle)) {
+      if (REGRESSION_RULE_CHECK.REFACTORING(diffPct)) {
+        totalTitle = `${baseTitle} ${PR_MESSAGE.REFACTORING_ERROR}`;
+      }
+    }
+
+    // REGRESSION
+    else if (globalRegression) {
+      totalTitle = `${baseTitle} ${PR_MESSAGE.REGRESSION_ERROR}`;
     }
   }
 
