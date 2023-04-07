@@ -89,8 +89,6 @@ function computeDiff(base, head, options = {}, prTitle) {
     )} (${_renderPct(diffPct)})`;
   });
 
-  console.log("diffPct", diffPct);
-
   if (diffPct != undefined && diffPct <= 0) {
     let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;
 

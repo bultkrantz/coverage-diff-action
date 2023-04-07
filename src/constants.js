@@ -3,8 +3,6 @@ const featureTreshold = core.getInput("prefix-feature");
 const bugfixTreshold = core.getInput("prefix-bugfix");
 const refactorTreshold = core.getInput("prefix-refactor");
 
-console.log("featureTreshold", featureTreshold);
-
 const PR_TITLE = Object.freeze({
   FEATURE: "feature/",
   BUGFIX: "bugfix/",

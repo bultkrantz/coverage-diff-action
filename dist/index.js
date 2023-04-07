@@ -13901,8 +13901,6 @@ const featureTreshold = core.getInput("prefix-feature");
 const bugfixTreshold = core.getInput("prefix-bugfix");
 const refactorTreshold = core.getInput("prefix-refactor");
 
-console.log("featureTreshold", featureTreshold);
-
 const PR_TITLE = Object.freeze({
   FEATURE: "feature/",
   BUGFIX: "bugfix/",
@@ -14040,8 +14038,6 @@ function computeDiff(base, head, options = {}, prTitle) {
       false
     )} (${_renderPct(diffPct)})`;
   });
-
-  console.log("diffPct", diffPct);
 
   if (diffPct != undefined && diffPct <= 0) {
     let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;
@@ -14421,6 +14417,8 @@ const { throwRegressionError } = __nccwpck_require__(377);
 const { context } = github;
 const prTitle = context.payload.pull_request.title;
 const isDependabotPr = context.actor === "dependabot";
+
+console.log("context.actor", context.actor);
 
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {

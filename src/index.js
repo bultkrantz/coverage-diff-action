@@ -22,6 +22,8 @@ const { context } = github;
 const prTitle = context.payload.pull_request.title;
 const isDependabotPr = context.actor === "dependabot";
 
+console.log("context.actor", context.actor);
+
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
     recursive: true,
