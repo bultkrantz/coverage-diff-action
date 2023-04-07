@@ -13897,15 +13897,11 @@ module.exports = { addComment, deleteExistingComments };
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const core = __nccwpck_require__(2186);
-const prefixes = core.getInput("prefix-options");
+const featureTreshold = core.getInput("prefix-feature");
+const bugfixTreshold = core.getInput("prefix-bugfix");
+const refactorTreshold = core.getInput("prefix-refactor");
 
-// prefixes model:
-// [
-//   {
-//     name: "feature/",
-//     threshold: 0,
-//   },
-// ];
+console.log("featureTreshold", featureTreshold);
 
 const PR_TITLE = Object.freeze({
   FEATURE: "feature/",
@@ -13914,10 +13910,9 @@ const PR_TITLE = Object.freeze({
 });
 
 const PERCENTAGE_THRESHOLD = Object.freeze({
-  FEATURE: prefixes?.find(({ name }) => name === "feature/")?.threshold || 0,
-  BUGFIX: prefixes?.find(({ name }) => name === "bugfix/")?.threshold || 0,
-  REFACTORING:
-    prefixes?.find(({ name }) => name === "refactoring/")?.threshold || 0,
+  FEATURE: featureTreshold || 0,
+  BUGFIX: bugfixTreshold || 0,
+  REFACTORING: refactorTreshold || 0,
 });
 
 const PR_MESSAGE = Object.freeze({
