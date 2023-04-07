@@ -72,9 +72,10 @@ function computeDiff(base, head, options = {}) {
 
   let totals = {};
   let globalRegression = false;
-  let diffPct = head.total[criteria].pct - base.total[criteria].pct;
+  let diffPct;
 
   CRITERIAS.forEach((criteria) => {
+    diffPct = head.total[criteria].pct - base.total[criteria].pct;
     if (diffPct < 0) {
       globalRegression = true;
     }
@@ -84,7 +85,7 @@ function computeDiff(base, head, options = {}) {
     )} (${_renderPct(diffPct)})`;
   });
 
-  if (diffPct <= 0) {
+  if (diffPct != undefined && diffPct <= 0) {
     let baseTitle = options.allowedToFail ? ICONS.WARN : ICONS.KO;
 
     // FEATURE
