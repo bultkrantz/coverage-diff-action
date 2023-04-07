@@ -20,9 +20,7 @@ const { throwRegressionError } = require("./regression");
 
 const { context } = github;
 const prTitle = context.payload.pull_request.title;
-const isDependabotPr = context.actor === "dependabot";
-
-console.log("context.actor", context.actor);
+const isDependabotPr = context.actor === "dependabot[bot]";
 
 async function run() {
   const tmpPath = await mkdir(path.join(process.env.GITHUB_WORKSPACE, "tmp"), {
