@@ -13913,7 +13913,7 @@ const PR_MESSAGE = Object.freeze({
 const REGRESSION_RULE_CHECK = Object.freeze({
   FEATURE: (regressionPercentage) => regressionPercentage <= 0,
   BUGFIX: (regressionPercentage) => regressionPercentage < 0,
-  REFACTORING: (regressionPercentage) => regressionPercentage < -5,
+  REFACTORING: (regressionPercentage) => regressionPercentage < -0.05,
 });
 
 const PR_TITLE_CHECK = Object.freeze({
