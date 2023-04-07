@@ -8,7 +8,7 @@ console.log("featureTreshold", featureTreshold);
 const PR_TITLE = Object.freeze({
   FEATURE: "feature/",
   BUGFIX: "bugfix/",
-  REFACTORING: "refactoring/",
+  REFACTORING: "refactor/",
 });
 
 const PERCENTAGE_THRESHOLD = Object.freeze({
