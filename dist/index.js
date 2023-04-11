@@ -14420,13 +14420,13 @@ const { addComment, deleteExistingComments } = __nccwpck_require__(427);
 const { throwRegressionError } = __nccwpck_require__(377);
 
 const { context } = github;
-const prTitle = context.payload.pull_request.title;
-const isDependabotPr = context.actor === "dependabot[bot]";
+const prTitle = context?.payload?.pull_request?.title ?? "No title found!";
+const isDependabotPr = context?.actor === "dependabot[bot]";
 
 async function run() {
   core.info(`PR Title: ${prTitle}`);
   core.info(`Is dependabot PR: ${isDependabotPr}`);
-  core.info(`Actor: ${context.actor}`);
+  core.info(`Actor: ${context?.actor ?? "No actor found!"}`);
 
   if (isDependabotPr) {
     core.info("This is a dependabot PR, skipping coverage diff");
